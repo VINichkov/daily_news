@@ -1,0 +1,8 @@
+version: "3.9"
+
+services:
+  app:
+    image: vnichkov/daily_news:0.01
+    command: python main.py
+    volumes:
+      - .:/share

@@ -1,0 +1,6 @@
+*Dockerfile*
+*share*
+*.log
+*.json
+*.db
+*.ini

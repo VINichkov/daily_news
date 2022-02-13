@@ -1,0 +1,10 @@
+version: "3.9"
+
+services:
+  app:
+    build: ./app
+    command: python main.py
+    volumes:
+      - .:/share
+    ports:
+      - "8000:8000"

@@ -1,0 +1,11 @@
+app/__pycache__/*
+.idea/*
+.idea
+.env
+*.log
+*.pyc
+sql_app.db
+venv/*
+*/__pycache__/*
+
+Будет удалено __pycache__/
