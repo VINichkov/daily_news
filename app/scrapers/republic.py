@@ -7,11 +7,26 @@ from urllib.parse import urlparse
 
 
 def _convert_to_article(tag: Tag) -> Article:
+    img = BeautifulSoup(tag.description.text, 'html.parser').find('img')
+    url_p = ''
+    desc = ''
+    if img is not None:
+        url_p = img.get('src')
+    desc_tag = tag.find('description')
+    if desc_tag is not None:
+        desc_all_text= desc_tag.text
+        index = desc_all_text.find('<br/>')
+        if index != -1:
+            desc = desc_all_text[index+5:].strip()
+
     return Article(
         url=_url(tag.source.get('url')),
-        tags="#republic",
+        tags="#republic #иностранный_агент",
         time=datetime.strptime(tag.pubdate.text, '%a, %d %b %Y %H:%M:%S %z').replace(tzinfo=None),
-        source='Republic'
+        source='Republic',
+        title=tag.find('title').text,
+        text=desc,
+        picture_url=url_p
     )
 
 
@@ -43,5 +58,5 @@ class Republic:
 
     def call(self) -> list:
         res = self._get_news_feeds()
-        logger.debug(F"Republic: articles of number {len(res)}")
+        logger.info(F"Republic: articles of number {len(res)}")
         return res

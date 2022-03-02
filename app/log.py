@@ -1,8 +1,10 @@
 import logging
-
+import os
 
 logger = logging.getLogger('daily_news')
-logger.setLevel(logging.DEBUG)
+if os.getenv('LOG_LEVEL') == 'debug':
+    logger.setLevel(logging.DEBUG)
+else:     logger.setLevel(logging.INFO)
 
 
 fileHandler = logging.FileHandler('./share/example.log')

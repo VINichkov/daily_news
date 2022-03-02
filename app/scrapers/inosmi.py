@@ -27,15 +27,17 @@ class Inosmi:
 
     def call(self) -> list:
         res = self._get_news_feeds()
-        logger.debug(F"Inosmi: articles of number {len(res)}")
+        logger.info(F"Inosmi: articles of number {len(res)}")
         return res
 
     def _convert_to_article(self, tag: Tag) -> Article:
         return Article(
             url=self.__domain + tag.find(class_='list-item__title').get('href'),
-            tags=f"#Inosmi #{self.__tags(tag.find(class_='source'))}".lower(),
+            tags=f"#Inosmi {self.__tags(tag.find(class_='source'))}".lower(),
             time= self.__date(tag.find(class_='list-item__date').text).replace(tzinfo=None),
-            source='Inosmi'
+            source='Inosmi',
+            title=tag.find(class_='list-item__title').text,
+            picture_url=tag.img.get('src')
         )
 
     def __tags(self, tag_name: Tag) -> str:

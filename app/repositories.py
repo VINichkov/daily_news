@@ -12,14 +12,14 @@ class ArticleRep:
     def get_first_item(self) -> Article:
 
         item = self.db.query(Article) \
-            .filter(Article.sent == False)\
+            .filter(Article.sent == False) \
             .order_by(Article.time.asc()).first()
         return item
 
     def get_last_time_by_source(self, source: str, delta: timedelta = timedelta(minutes=20)) -> datetime:
         offset = timezone(timedelta(hours=3))  # UTS MSK
-        item = self.db.query(Article)\
-            .filter(Article.source == source)\
+        item = self.db.query(Article) \
+            .filter(Article.source == source) \
             .order_by(Article.time.desc()).first()
         if item is None:
 
@@ -42,3 +42,8 @@ class ArticleRep:
         self.db.query(Article).filter(Article.id == article.id).update({'sent': True})
         self.db.commit()
         return article
+
+    def clear(self):
+        time = datetime.now() - timedelta(days=1)
+        self.db.query(Article).where(Article.sent == True, Article.time < time).delete()
+        self.db.commit()

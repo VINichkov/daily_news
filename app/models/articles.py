@@ -10,5 +10,8 @@ class Article(Base):
     source = Column(String, nullable=False)
     url = Column(String, nullable=False)
     tags = Column(String, nullable=False)
+    text = Column(String)
+    picture_url = Column(String)
+    title = Column(String, nullable=False)
     time = Column(DateTime(timezone=True), nullable=False)
     sent = Column(Boolean, default=False)

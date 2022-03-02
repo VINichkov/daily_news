@@ -12,7 +12,9 @@ def _convert_to_article(tag: Tag) -> Article:
         url=tag.find('rbc_news:pdalink').text,
         tags=f"#rbc #{tag.category.text.replace(' ', '_')}".lower(),
         time=datetime.strptime(tag.pubdate.text, '%a, %d %b %Y %H:%M:%S %z').replace(tzinfo=None),
-        source='RBC'
+        source='RBC',
+        title=tag.find('title').text,
+        text=tag.find('description').text
     )
 
 
@@ -32,11 +34,27 @@ class RBC:
         response = requests.get(self.__url)
         soup = BeautifulSoup(response.text, 'html.parser')
         elems = soup.find_all('item')
-        list_articles = list(map(_convert_to_article, elems))
-        return list(filter(filter_fun, list_articles))
+        all_articles = list(map(_convert_to_article, elems))
+        filtered_articles = list(filter(filter_fun, all_articles))
+        return list(map(self._get_picture, filtered_articles))
+
+    def _get_picture(self, article: Article)->Article:
+        response = requests.get(article.url)
+        soup = BeautifulSoup(response.text, 'html.parser')
+        #with open(f"{i}.html", 'w') as f:
+         #   f.write(soup.prettify())
+        #TODO не было картинки
+        img = soup.find(class_='g-image')
+        if img is None:
+            article.picture_url = 'https://toplogos.ru/images/thumbs/preview-logo-rbc.png'
+        else:
+            article.picture_url = soup.find(class_='g-image').get('src')
+        return article
+        #g-image  article__main-image__image
 
 
     def call(self) -> list:
         res = self._get_news_feeds()
-        logger.debug(F"RBC: articles of number {len(res)}")
+        #self._get_news_feeds()
+        logger.info(F"RBC: articles of number {len(res)}")
         return res

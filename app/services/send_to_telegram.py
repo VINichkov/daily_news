@@ -1,4 +1,7 @@
 import os
+from PIL import Image
+import requests
+
 import config
 from log import logger
 from channel import Telegram
@@ -20,5 +23,19 @@ class SendToTelegram:
         if article_bd is not None:
             article_msg = ArticleMsg()
             article_msg.from_article_model(article_bd)
-            self.tm.send_message(article_msg.text_msg())
+            try:
+                self.tm.send_news(
+                    picture=self.validate_image(article_msg.picture_url),
+                    text=article_msg.text_msg(),
+                    url=article_msg.url)
+            except Exception:
+                logger.error('Ошибка отправки:\n', traceback.format_exc())
             self.rep.sent(article_bd)
+
+    def validate_image(self, img: str) -> any:
+        im = Image.open(requests.get(img, stream=True).raw)
+        (width, height) = im.size
+        if width > 1200:
+            return im.resize([1200, 800])
+        else:
+            return img

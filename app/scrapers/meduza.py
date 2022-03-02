@@ -8,11 +8,19 @@ from datetime import timedelta
 
 
 def _convert_to_article(tag: Tag) -> Article:
+    desc_tag = BeautifulSoup(tag.find('description').text, 'html.parser')
+    desc = ''
+    if desc_tag is not None:
+        p = desc_tag.find_all('p')[2]
+        if p is not None:
+            desc = p.text
     return Article(
         url=tag.guid.text,
         tags="#meduza",
         time=datetime.strptime(tag.pubdate.text, '%a, %d %b %Y %H:%M:%S %z').replace(tzinfo=None),
-        source='Meduza'
+        source='Meduza',
+        title=desc,
+        picture_url = 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/86/Meduza_logo.svg/200px-Meduza_logo.svg.png'
     )
 
 
@@ -38,5 +46,5 @@ class Meduza:
 
     def call(self) -> list:
         res = self._get_news_feeds()
-        logger.debug(F"Meduza: articles of number {len(res)}")
+        logger.info(F"Meduza: articles of number {len(res)}")
         return res
